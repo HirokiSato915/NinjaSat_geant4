@@ -1,0 +1,132 @@
+//
+// ********************************************************************
+// * License and Disclaimer                                           *
+// *                                                                  *
+// * The  Geant4 software  is  copyright of the Copyright Holders  of *
+// * the Geant4 Collaboration.  It is provided  under  the terms  and *
+// * conditions of the Geant4 Software License,  included in the file *
+// * LICENSE and available at  http://cern.ch/geant4/license .  These *
+// * include a list of copyright holders.                             *
+// *                                                                  *
+// * Neither the authors of this software system, nor their employing *
+// * institutes,nor the agencies providing financial support for this *
+// * work  make  any representation or  warranty, express or implied, *
+// * regarding  this  software system or assume any liability for its *
+// * use.  Please see the license in the file  LICENSE  and URL above *
+// * for the full disclaimer and the limitation of liability.         *
+// *                                                                  *
+// * This  code  implementation is the result of  the  scientific and *
+// * technical work of the GEANT4 collaboration.                      *
+// * By using,  copying,  modifying or  distributing the software (or *
+// * any work based  on the software)  you  agree  to acknowledge its *
+// * use  in  resulting  scientific  publications,  and indicate your *
+// * acceptance of all terms of the Geant4 Software license.          *
+// ********************************************************************
+//
+//
+/// \file B3A.cc
+/// \brief Implementation of the B3PrimaryGeneratorAction class
+
+#include "B3PrimaryGeneratorAction.hh"
+
+#include "G4RunManager.hh"
+#include "G4Event.hh"
+#include "G4ParticleGun.hh"
+#include "G4ParticleTable.hh"
+#include "G4IonTable.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4ChargedGeantino.hh"
+#include "G4SystemOfUnits.hh"
+#include "Randomize.hh"
+#include "G4RandomDirection.hh"
+#include "B3Constants.hh"
+#include "G4RotationMatrix.hh"
+#include <iostream>
+#include <string> // useful for reading and writing
+
+#include <fstream> // ifstream, ofstream
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+B3PrimaryGeneratorAction::B3PrimaryGeneratorAction()
+    : G4VUserPrimaryGeneratorAction(),
+      fParticleGun(0)
+{
+  G4int n_particle = 1;
+  fParticleGun = new G4ParticleGun(n_particle);
+
+  // default particle kinematic
+  G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition *particle = particleTable->FindParticle("gamma");
+  fParticleGun->SetParticleDefinition(particle);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+B3PrimaryGeneratorAction::~B3PrimaryGeneratorAction()
+{
+  delete fParticleGun;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
+{ //auto parti = (G4UniformRand() * (99.0 - 1.0) + 1.0) * keV;
+  //std::ofstream ofsp("particle.txt", std::ios::app);
+  //ofsp << parti << std::endl;
+  auto bb = G4UniformRand();
+  parti = (bb * (30.0 - 1.0) + 1.0) * keV;
+  fParticleGun->SetParticleEnergy(parti);
+  //fParticleGun->SetParticleEnergy(2 * keV);
+
+  G4double phia = 360. * G4UniformRand() * degree;
+  G4double costa = (G4UniformRand() - 0.5) * 2.0;
+  G4double sinta = sqrt(1. - costa * costa);
+  G4double cosphia = cos(phia);
+  G4double sinphia = sin(phia);
+  G4double dx1 = sinta * cosphia, dy1 = sinta * sinphia, dz1 = costa;
+  G4ThreeVector point1(dx1, dy1, dz1);
+
+  G4double phib = 360. * G4UniformRand() * degree;
+  G4double cosphib = cos(phib);
+  G4double sinphib = sin(phib);
+  G4double dx2 = sinphia * cosphib + costa * cosphia * sinphib;
+  G4double dy2 = cosphia * cosphib - costa * sinphia * sinphib;
+  G4double dz2 = -sinta * sinphib;
+  G4ThreeVector point2(dx2, dy2, dz2);
+
+  //G4double maxradius = (pRMax + Alring_thickness + Snring_thickness + Pbring_thickness);
+  //G4double maxheight = (pDz + Alring_thickness + Snring_thickness + Pbring_thickness);
+  //G4double targetR = sqrt(pow(maxradius*2, 2) + pow(maxheight*2, 2))/2;
+  G4double targetR = 3.5 * cm;
+  G4double length = 8. * cm;
+  G4double tau = 360 * degree * G4UniformRand();
+  G4ThreeVector point3 = point2.rotate(point1, tau);
+  //G4ThreeVector point4=point3*sqrt(G4UniformRand());
+  G4ThreeVector point5 = point3 * targetR * sqrt(G4UniformRand());
+  G4ThreeVector point6 = point1 * length;
+  G4ThreeVector position = point5 + point6;
+  G4ThreeVector mom = -point1;
+
+  /*
+G4ThreeVector observationP1(0*mm,0*mm,0*mm);
+G4double distancex1=observationP1.x()-position.x();
+G4double distancey1=observationP1.y()-position.y();
+G4double distancez1=observationP1.z()-position.z();
+G4double distancex11=pow(distancex1,2), distancey11=pow(distancey1,2), distancez11=pow(distancez1,2);
+G4double distance1=sqrt(distancex11+distancey11+distancez11);
+G4double costheta1=(position.z()-observationP1.z())/distance1;
+G4double tanphi1=distancey1/distancex1;
+G4double phi1=atan(tanphi1);
+G4double phiphi1=phi1*180/3.14159265358979323846;
+std::ofstream ofstheta1("./matlab/data/theta.txt", std::ios::app);
+ofstheta1 << costheta1 << std::endl;
+std::ofstream ofsphi1("./matlab/data/phi.txt", std::ios::app);
+ofsphi1 << phiphi1 << std::endl;
+*/
+  fParticleGun->SetParticlePosition(position);
+  //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, -1));
+  fParticleGun->SetParticleMomentumDirection(mom);
+  fParticleGun->GeneratePrimaryVertex(anEvent);
+}
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

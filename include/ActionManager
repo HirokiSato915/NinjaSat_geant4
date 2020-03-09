@@ -1,0 +1,71 @@
+// ActionManager.hh
+
+#ifndef ActionManager_hh
+#define ActionManager_hh 1
+
+class ActionManager{
+　private:
+　　static ActionManager* actionmanager;
+　　G4double edepByEvent;
+
+　public:
+　　static ActionManager* GetActionManager(); // ActionManagerクラスを呼び出す関数
+　　void SetEdepByEvent(G4double edep); // イベントの始まりに初期値を設定する関数
+　　void AddEdepByEvent(G4double edep); // 検出器へ付与されたエネルギーを足し合わせる関数
+　　G4double GetEdepByEvent() const; // 1つのイベントで付与された全エネルギーを取り出す関数
+};
+
+//以下、関数の定義
+
+inline ActionManager* ActionManager::GetActionManager(){
+　if(actionmanager=0){actionmanager = new ActionManager();}
+　　return actionmanager;
+}
+
+inline void ActionManager::SetEdepByEvent(G4double edep){
+　edepByEvent = edep;
+　return;
+}
+
+inline void ActionManager::AddEdepByEvent(G4double edep){
+　edepByEvent += edep;
+　return;
+}
+
+inline G4double ActionManager::GetEdepByEvent(){
+　return edepByEvent;
+}
+
+#endif
+
+
+
+//これで必要な定義ができたので、この関数を使ってデータのやりとりをします。
+//ActionManagerを使用するときには必ず下の一文を記述しましょう。
+
+ActionManager *action = ActionManager::GetActionManager();
+
+//めんどくさいので以下では省略します。
+
+//まずは、EventAction.ccのBeginOfEventAction関数内で初期値の設定をします。
+
+action->SetEdepByEvent(0.);
+
+//これでイベント開始時に付与エネルギーが0に初期化されます。
+//次に、EndOfEventAction関数内で付与エネルギーの情報を取り出します。
+
+action->GetedepByEvent();
+
+//これで、1つのイベントで付与されたエネルギーの総和が返ってきます。
+
+//最後に、前の記事で書いた～SDというファイルのProcessHits関数内で付与エネルギーの足し合わせをします。
+//前はedepという変数に付与エネルギーを代入したので、これを関数の引数とします。
+
+action->AddEdepByEvent(edep);
+
+//これで1つのイベント中に付与されたエネルギーが足されていきます。
+
+
+//Runごとの情報も同様にしてActionManager内に関数を作ってやれば取り出すことができます。
+//関数をカスタマイズして、エネルギーと同時に相互作用をした粒子の名前を取り出したり、
+//ディテクターの名前やコピーナンバーごとに情報を取り出すこともできちゃいます。
