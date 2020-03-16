@@ -33,14 +33,6 @@
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 
-/// Event action class
-///
-/// It defines data members to hold the energy deposit and track lengths
-/// of charged particles in Absober and Gap layers:
-/// - fEnergyAbs, fEnergyGap, fTrackLAbs, fTrackLGap
-/// which are collected step by step via the functions
-/// - AddAbs(), AddGap()
-
 class B3aEventAction : public G4UserEventAction
 {
 public:
@@ -50,19 +42,15 @@ public:
   virtual void BeginOfEventAction(const G4Event *event);
   virtual void EndOfEventAction(const G4Event *event);
 
-  //void AddSens(G4double de);
   void AddSens(G4double de);
   void AddEn(G4double en);
 
 private:
-  //G4double fEnergySens;
   G4double fEnergySens;
   G4double fEnergy;
 };
 
 // inline functions
-
-//inline void B3aEventAction::AddSens(G4double de)
 inline void B3aEventAction::AddEn(G4double en)
 {
   fEnergy += en;

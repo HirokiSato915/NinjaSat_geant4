@@ -65,9 +65,6 @@ void B3aActionInitialization::Build() const
   SetUserAction(new B3PrimaryGeneratorAction(eventAction));
   SetUserAction(new B3aRunAction);
   SetUserAction(eventAction);
-  //auto trackingAction = new B3aTrackingAction(fDetConstruction);
-  //SetUserAction(trackingAction);
-  //SetUserAction(eventAction);
   SetUserAction(new B3aSteppingAction(fDetConstruction, eventAction));
 }
 

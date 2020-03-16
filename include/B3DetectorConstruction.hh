@@ -34,7 +34,6 @@
 #include "globals.hh"
 
 class G4VPhysicalVolume;
-//class G4GlobalMagFieldMessenger;
 class G4LogicalVolume;
 
 class B3DetectorConstruction : public G4VUserDetectorConstruction

@@ -35,12 +35,6 @@
 class B3DetectorConstruction;
 class B3aEventAction;
 
-/// Stepping action class.
-///
-/// In UserSteppingAction() there are collected the energy deposit and track
-/// lengths of charged particles in Absober and Gap layers and
-/// updated in B4aEventAction.
-
 class B3aSteppingAction : public G4UserSteppingAction
 {
 public:

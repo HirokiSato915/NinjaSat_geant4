@@ -58,25 +58,12 @@ void B3aSteppingAction::UserSteppingAction(const G4Step *step)
 {
   // get volume of the current step
   auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-  //auto momentum = step->GetPreStepPoint()->GetMomentumDirection();
 
   // energy deposit
   if (volume != fDetConstruction->GetSensitivePV())
     return;
 
-  auto momentum = step->GetTrack()->GetMomentumDirection();
-  G4double theta = momentum.cosTheta(), phi = momentum.phi();
-  //auto Kenergy = step->GetTrack()->GetKineticEnergy();
-  std::ofstream ofss("cosT.txt", std::ios::app);
-  ofss << theta << std::endl;
-  std::ofstream ofsp("phi.txt", std::ios::app);
-  ofsp << phi << std::endl;
-
-  /*
   auto edep = step->GetTotalEnergyDeposit();
   fEventAction->AddSens(edep);
-*/
-  //fEventAction->AddSens(1);
-  //fEventAction->AddSens(momentum);
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

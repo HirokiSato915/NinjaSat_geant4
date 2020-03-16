@@ -39,12 +39,6 @@
 #include "Randomize.hh"
 #include <iomanip>
 
-//#include "G4SDManager.hh"
-//#include "G4HCofThisEvent.hh"
-//#include "G4THitsMap.hh"
-
-//#include "G4SystemOfUnits.hh"
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 B3aEventAction::B3aEventAction()
@@ -64,11 +58,7 @@ B3aEventAction::~B3aEventAction()
 
 void B3aEventAction::BeginOfEventAction(const G4Event * /*event*/)
 {
-  //std::ofstream ofsp("particle.txt", std::ios::app);
-  //ofsp << fEnergy << std::endl;
-  // initialisation per event
   fEnergySens = 0.;
-  //fEnergy = 0.;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -77,32 +67,20 @@ void B3aEventAction::EndOfEventAction(const G4Event * /*event*/)
 {
   // Accumulate statistics
   //
-  //if (fEnergySens != 0)
-  //{
-  /*
-    std::ofstream ofsp("particle.txt", std::ios::app);
-    ofsp << fEnergy << std::endl;
-    */
+  if (fEnergySens != 0)
+  {
+    auto analysisManager = G4AnalysisManager::Instance();
 
-  //auto analysisManager = G4AnalysisManager::Instance();
+    analysisManager->FillH1(0, fEnergy * 1000);
+    analysisManager->FillH1(1, fEnergySens * 1000);
 
-  /*
-    analysisManager->FillH1(0, fEnergy);
-    analysisManager->FillH1(1, fEnergySens);
-    */
+    // fill ntuple
+    analysisManager->FillNtupleDColumn(0, fEnergy * 1000);
+    analysisManager->FillNtupleDColumn(1, fEnergySens * 1000);
+    analysisManager->AddNtupleRow();
+  }
 
-  // fill ntuple
-  //analysisManager->FillNtupleDColumn(0, fEnergy);
-  //analysisManager->FillNtupleDColumn(1, fEnergySens);
-  //analysisManager->AddNtupleRow();
-
-  //}
-
-  // get analysis manager
-  //std::cout << initEnergy << std::endl;
-  // fill histograms
-
-  //fEnergy = 0.;
+  fEnergy = 0.;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

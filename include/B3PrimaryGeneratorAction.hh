@@ -34,7 +34,6 @@
 #include "globals.hh"
 
 class G4GeneralParticleSource;
-//class G4Event;
 class B3aEventAction;
 
 class B3PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
@@ -53,23 +52,3 @@ private:
 };
 
 #endif
-
-/*
-lass G4GeneralParticleSource;
-class G4Event;
-
-class B3PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
-public:
-  B3PrimaryGeneratorAction();
-  ~B3PrimaryGeneratorAction();
-
-public:
-  void GeneratePrimaries(G4Event *anEvent);
-  G4GeneralParticleSource *GetParticleGun() { return particleGun; }
-
-private:
-  G4GeneralParticleSource *particleGun;
-  B3aEventAction *fEventAction;
-};
-*/

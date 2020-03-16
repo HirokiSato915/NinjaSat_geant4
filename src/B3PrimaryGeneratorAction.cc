@@ -59,8 +59,7 @@ B3PrimaryGeneratorAction::B3PrimaryGeneratorAction(
 {
   particleGun = new G4GeneralParticleSource();
   G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
-  //G4ParticleDefinition *particle = particleTable->FindParticle("gamma");
-  G4ParticleDefinition *particle = particleTable->FindParticle("geantino");
+  G4ParticleDefinition *particle = particleTable->FindParticle("gamma");
   //....PARTICLE DEFINITIONS
   particleGun->SetParticleDefinition(particle);
 
@@ -68,8 +67,7 @@ B3PrimaryGeneratorAction::B3PrimaryGeneratorAction(
   G4SPSEneDistribution *eneDist = particleGun->GetCurrentSource()->GetEneDist();
   eneDist->SetEnergyDisType("Pow");
   eneDist->SetAlpha(-1.29);
-  //eneDist->SetAlpha(0);
-  eneDist->SetEmax(100 * keV);
+  eneDist->SetEmax(200 * keV);
   eneDist->SetEmin(1 * keV);
 }
 
@@ -81,43 +79,15 @@ B3PrimaryGeneratorAction::~B3PrimaryGeneratorAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 {
-  /*
-  G4double phia = 360. * G4UniformRand() * degree;
-  G4double costa = (G4UniformRand() - 0.5) * 2.0;
-  G4double sinta = sqrt(1. - costa * costa);
-  G4double cosphia = cos(phia);
-  G4double sinphia = sin(phia);
-  G4double dx1 = sinta * cosphia, dy1 = sinta * sinphia, dz1 = costa;
-  G4ThreeVector point1(dx1, dy1, dz1);
-  //G4ThreeVector point1(0, 0, 1);
-
-  G4double phib = 360. * G4UniformRand() * degree;
-  G4double cosphib = cos(phib);
-  G4double sinphib = sin(phib);
-  G4double dx2 = sinphia * cosphib + costa * cosphia * sinphib;
-  G4double dy2 = -cosphia * cosphib + costa * sinphia * sinphib;
-  G4double dz2 = -sinta * sinphib;
-  G4ThreeVector point2(dx2, dy2, dz2);
-*/
-  //G4double targetR = 1.35 * cm;
   G4double targetR = 5.4 * cm;
   G4double length = 8. * cm;
-
-  /*
-  G4double tau = 360. * degree * G4UniformRand();
-  G4ThreeVector point3 = point2.rotate(point1, tau);
-  G4ThreeVector point5 = point3 * targetR * sqrt(G4UniformRand());
-  G4ThreeVector point6 = point1 * length;
-  G4ThreeVector position = point5 + point6;
-  G4ThreeVector mom = -point1;
-*/
 
   G4ThreeVector dir1 = G4RandomDirection();
   G4ThreeVector dir2 = dir1.orthogonal();
   dir2.setR(targetR * sqrt(G4UniformRand()));
   dir2.rotate(2 * CLHEP::pi * G4UniformRand(), dir1);
 
-  G4ThreeVector center(0, 0, 5.85 * mm);
+  G4ThreeVector center(0, 0, 7.5 * mm);
   G4ThreeVector position = center + dir1 * length + dir2;
   G4ThreeVector mom = -dir1;
 
@@ -131,11 +101,6 @@ void B3PrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
   particleGun->GeneratePrimaryVertex(anEvent);
   G4double initEnergy = particleGun->GetParticleEnergy();
   fEventAction->AddEn(initEnergy);
-
-  /*
-  std::ofstream ofsp("particle.txt", std::ios::app);
-  ofsp << initEnergy << std::endl;
-  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

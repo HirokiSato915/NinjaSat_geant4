@@ -40,14 +40,10 @@
 B3aRunAction::B3aRunAction()
     : G4UserRunAction()
 {
-  // set printing event number per each event
-  //G4RunManager::GetRunManager()->SetPrintProgress(1);
-
   // Create analysis manager
   // The choice of analysis technology is done via selectin of a namespace
   // in B4Analysis.hh
 
-  /*
   auto analysisManager = G4AnalysisManager::Instance();
   G4cout << "Using " << analysisManager->GetType() << G4endl;
   // Create directories
@@ -55,25 +51,20 @@ B3aRunAction::B3aRunAction()
   //analysisManager->SetNtupleDirectoryName("ntuple");
   analysisManager->SetVerboseLevel(1);
   analysisManager->SetNtupleMerging(true);
-  */
 
   // Note: merging ntuples is available only with Root output
 
   // Book histograms, ntuple
   //
   // Creating histograms
-  /*
-  analysisManager->CreateH1("EInit", "Einit in sensible", 100, 0., 100 * keV);
-  analysisManager->CreateH1("ESens", "Edep in sensible", 100, 0., 100 * keV);
-  */
+  analysisManager->CreateH1("EInit", "Einit in sensible", 1000, 0., 200.);
+  analysisManager->CreateH1("ESens", "Edep in sensible", 1000, 0., 200.);
   // Creating ntuple
   //
-  /*
-  analysisManager->CreateNtuple("B3_1-30keV", "Edep");
+  analysisManager->CreateNtuple("NinjaSat", "Edep");
   analysisManager->CreateNtupleDColumn("EInit");
   analysisManager->CreateNtupleDColumn("ESens");
   analysisManager->FinishNtuple();
-  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -91,14 +82,12 @@ void B3aRunAction::BeginOfRunAction(const G4Run * /*run*/)
   G4RunManager::GetRunManager()->SetRandomNumberStore(true);
 
   // Get analysis manager
-  //auto analysisManager = G4AnalysisManager::Instance();
+  auto analysisManager = G4AnalysisManager::Instance();
 
   // Open an output file
   //
-  /*
-  G4String fileName = "B3-edep3";
+  G4String fileName = "edep";
   analysisManager->OpenFile(fileName);
-  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -107,12 +96,10 @@ void B3aRunAction::EndOfRunAction(const G4Run * /*run*/)
 {
   // print histogram statistics
   //
-  /*
   auto analysisManager = G4AnalysisManager::Instance();
   // save histograms & ntuple
   //
   analysisManager->Write();
   analysisManager->CloseFile();
-  */
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

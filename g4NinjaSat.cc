@@ -137,8 +137,6 @@ int main(int argc, char **argv)
   //
   auto detConstruction = new B3DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
-  //runManager->SetUserInitialization(new B3DetectorConstruction);
-  //
   runManager->SetUserInitialization(new B3PhysicsList);
 
   // Set user action initialization
@@ -146,13 +144,9 @@ int main(int argc, char **argv)
   auto actionInitialization = new B3aActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
 
-  //runManager->SetUserInitialization(new B3aActionInitialization);
-
   // Initialize visualization
   //
   G4VisManager *visManager = new G4VisExecutive;
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
   // Get the pointer to the User Interface manager

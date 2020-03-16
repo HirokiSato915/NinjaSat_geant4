@@ -55,12 +55,9 @@
 #include "B3Constants.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//G4ThreadLocal
-//G4GlobalMagFieldMessenger *B3DetectorConstruction::fMagFieldMessenger = nullptr;
 
 B3DetectorConstruction::B3DetectorConstruction()
     : G4VUserDetectorConstruction(),
-      //fSensitivePV(nullptr),
       fSensitivePV(0),
       fCheckOverlaps(true)
 {
@@ -95,7 +92,6 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
     G4double denC = 12.01 * g / mole;
     G4Element *elC = new G4Element("Carbon", "C", 6., denC);
 
-    //G4double densityco2 = 1.977 * 273. * mg / cm3 / 293.;
     G4double denCO2 = 1.977 * mg / cm3;
     G4Material *CarbonDioxide = new G4Material("CO2", denCO2, 2);
     CarbonDioxide->AddElement(elC, 1);
@@ -125,10 +121,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
     G4NistManager *nist = G4NistManager::Instance();
     G4Material *St = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");
 
-    G4double denLCP = 1.65 * g / cm3;
-    G4Material *LCP = new G4Material("LCP", denLCP, 2);
-    LCP->AddElement(elC, .7);
-    LCP->AddElement(elO, .3);
+    G4Material *LCP = nist->FindOrBuildMaterial("G4_KAPTON");
     G4Material *Cu = nist->FindOrBuildMaterial("G4_Cu");
 
     //
@@ -153,9 +146,11 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                           0,               //copy number
                           fCheckOverlaps); // checking overlaps
                                            //
-                                           /*                           
-    // Pbシールドチェンバー本体
-    //
+
+    /*    
+    //                       
+    // Pbシールド
+    // チェンバー本体
     G4Tubs *PbTube =
         new G4Tubs("PbTube", pRMax + Alring_thickness, pRMax + Alring_thickness + Pbring_thickness, pDz, pSPhi, pDPhi);
 
@@ -166,7 +161,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
 
     G4VPhysicalVolume *physPbTube =
         new G4PVPlacement(0,                               // no rotation
-                          G4ThreeVector(0, 0, -1.65 * mm), // at (0,0,0)
+                          G4ThreeVector(0, 0, 0), // at (0,0,0)
                           logicPbTube,                     // its logical volume
                           "PbPV",                          // its name
                           logicWorld,                      // its mother  volume
@@ -174,7 +169,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                           0,                               // copy number
                           fCheckOverlaps);                 // checking overlaps
 
-    //コリメータ部Pbシールド
+    //コリメータ部
     G4Tubs *PbLid1 =
         new G4Tubs("PbLid", winR + 1 * mm, winR + 1 * mm + Pbring_thickness, 0.75 * cm, pSPhi, pDPhi);
     G4LogicalVolume *logicPbLid1 =
@@ -183,7 +178,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                             "PbLid"); //its name
     G4VPhysicalVolume *physPbLid1 =
         new G4PVPlacement(0,                                                // no rotation
-                          G4ThreeVector(0, 0, pDz + 0.75 * cm - 1.65 * mm), // at (0,0,0)
+                          G4ThreeVector(0, 0, pDz + 0.75 * cm 0), // at (0,0,0)
                           logicPbLid1,                                      // its logical volume
                           "PbLidPV1",                                       // its name
                           logicWorld,                                       // its mother  volume
@@ -200,7 +195,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                             "PbLid"); //its name
     G4VPhysicalVolume *physPbLid2 =
         new G4PVPlacement(0,                                                              // no rotation
-                          G4ThreeVector(0, 0, -(pDz + Pbring_thickness / 2 + 1.65 * mm)), // at (0,0,0)
+                          G4ThreeVector(0, 0, -(pDz + Pbring_thickness / 2)), // at (0,0,0)
                           logicPbLid2,                                                    // its logical volume
                           "PbLidPV2",                                                     // its name
                           logicWorld,                                                     // its mother  volume
@@ -208,7 +203,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                           0,                                                              // copy number
                           fCheckOverlaps);
 
-    //上蓋
+    //上リング部
     G4Tubs *PbLid3 =
         new G4Tubs("PbLid", winR + 1 * mm + Pbring_thickness, pRMax + Alring_thickness + Pbring_thickness, Pbring_thickness / 2, pSPhi, pDPhi);
     G4LogicalVolume *logicPbLid3 =
@@ -217,7 +212,7 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                             "PbLid"); //its name
     G4VPhysicalVolume *physPbLid3 =
         new G4PVPlacement(0,                                                           // no rotation
-                          G4ThreeVector(0, 0, pDz + Pbring_thickness / 2 - 1.65 * mm), // at (0,0,0)
+                          G4ThreeVector(0, 0, pDz + Pbring_thickness / 2), // at (0,0,0)
                           logicPbLid3,                                                 // its logical volume
                           "PbLidPV3",                                                  // its name
                           logicWorld,                                                  // its mother  volume
@@ -238,14 +233,14 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                             "AlChamber"); //its name
 
     G4VPhysicalVolume *physAlChamber =
-        new G4PVPlacement(0,                               // no rotation
-                          G4ThreeVector(0, 0, -1.65 * mm), // at (0,0,0)
-                          logicAlChamber,                  // its logical volume
-                          "AlPV",                          // its name
-                          logicWorld,                      // its mother  volume
-                          false,                           // no boolean operations
-                          0,                               // copy number
-                          fCheckOverlaps);                 // checking overlaps
+        new G4PVPlacement(0,                      // no rotation
+                          G4ThreeVector(0, 0, 0), // at (0,0,0)
+                          logicAlChamber,         // its logical volume
+                          "AlPV",                 // its name
+                          logicWorld,             // its mother  volume
+                          false,                  // no boolean operations
+                          0,                      // copy number
+                          fCheckOverlaps);        // checking overlaps
 
     //
     // XeCO2 GasCell
@@ -273,26 +268,22 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
     //
 
     G4Tubs *SolidSensitive =
-        new G4Tubs("Sensitive", pRMin, 33.5 * mm, 8.1 * mm, pSPhi, pDPhi);
+        new G4Tubs("Sensitive", pRMin, 33.5 * mm, 7.65 * mm, pSPhi, pDPhi);
 
-    /*
-    G4Orb *SolidSensitive =
-        new G4Orb("Sensitive", 1.0 * mm);
-*/
     G4LogicalVolume *logicSensitive =
         new G4LogicalVolume(SolidSensitive, //its solid
                             Xe5CO2,         //its material
                             "Sensitive");   //its name
 
     fSensitivePV =
-        new G4PVPlacement(0,                              // no rotation
-                          G4ThreeVector(0, 0, 1.15 * mm), // at (0,0,0)
-                          logicSensitive,                 // its logical volume
-                          "SensitivePV",                  // its name
-                          logicGasCell,                   // its mother  volume
-                          false,                          // no boolean operations
-                          0,                              // copy number
-                          fCheckOverlaps);                // checking overlaps
+        new G4PVPlacement(0,                             // no rotation
+                          G4ThreeVector(0, 0, 1.6 * mm), // at (0,0,0)
+                          logicSensitive,                // its logical volume
+                          "SensitivePV",                 // its name
+                          logicGasCell,                  // its mother  volume
+                          false,                         // no boolean operations
+                          0,                             // copy number
+                          fCheckOverlaps);               // checking overlaps
 
     //
     //GEM
@@ -496,14 +487,14 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                             "Collimeter"); //its name
 
     G4VPhysicalVolume *physCollimeter =
-        new G4PVPlacement(0,                                                // no rotation
-                          G4ThreeVector(0, 0, pDz + 0.75 * cm - 1.65 * mm), // at (0,0,0)
-                          logicCollimeter,                                  // its logical volume
-                          "CollimeterPV",                                   // its name
-                          logicWorld,                                       // its mother  volume
-                          false,                                            // no boolean operations
-                          0,                                                // copy number
-                          fCheckOverlaps);                                  // checking overlaps
+        new G4PVPlacement(0,                                    // no rotation
+                          G4ThreeVector(0, 0, pDz + 0.75 * cm), // at (0,0,0)
+                          logicCollimeter,                      // its logical volume
+                          "CollimeterPV",                       // its name
+                          logicWorld,                           // its mother  volume
+                          false,                                // no boolean operations
+                          0,                                    // copy number
+                          fCheckOverlaps);                      // checking overlaps
 
     //
     //Vacuum_Tubes　Hexagon　
@@ -521,20 +512,18 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
 
     G4RotationMatrix *rotCounter = new G4RotationMatrix;
     rotCounter->rotateZ(90. * deg);
-    //G4ThreeVector xyzCounter;
-    //G4Transform3D posCounter(*rotCounter, xyzCounter);
 
     auto y_width = (1.8 / sqrt(3) + 0.1 * sqrt(3)) * mm;
-    for (auto h = -28; h < 29; h++)
+    for (auto y_num = -28; y_num < 29; y_num++)
     {
-        int H = sqrt(pow(h, 2));
-        int abc = sqrt(pow(35, 2) - pow(y_width * (H + 0.25), 2)) / 0.7;
-        for (int i = -abc - 1; i < abc + 1; i++)
+        int h = sqrt(pow(y_num, 2));
+        int x_num = sqrt(pow(35, 2) - pow(y_width * (h + 0.25), 2)) / 0.7;
+        for (int i = -x_num - 1; i < x_num + 1; i++)
         {
             auto x_width = 0.7 * i * mm;
-            auto hh = h - 0.25;
+            auto hh = y_num - 0.25;
 
-            if (i == -abc - 1 && h != -29)
+            if (i == -x_num - 1 && y_num != -29)
             {
                 G4VPhysicalVolume *physVacuum_Tube_b =
                     new G4PVPlacement(rotCounter,                                          // no rotation
@@ -547,20 +536,20 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                                       fCheckOverlaps);                                     // checking overlaps
             }
 
-            if (i != -abc - 1 && h == -29)
+            if (i != -x_num - 1 && y_num == -29)
             {
                 G4VPhysicalVolume *physVacuum_Tube_a =
-                    new G4PVPlacement(rotCounter,                                      // no rotation
-                                      G4ThreeVector(x_width, y_width * (h + 0.25), 0), // at (0,0,0)
-                                      logicVacuum_Tube,                                // its logical volume
-                                      "Vacuum_TubePV",                                 // its name
-                                      logicCollimeter,                                 // its mother  volume
-                                      false,                                           // no boolean operations
-                                      0,                                               // copy number
-                                      fCheckOverlaps);                                 // checking overlaps
+                    new G4PVPlacement(rotCounter,                                          // no rotation
+                                      G4ThreeVector(x_width, y_width * (y_num + 0.25), 0), // at (0,0,0)
+                                      logicVacuum_Tube,                                    // its logical volume
+                                      "Vacuum_TubePV",                                     // its name
+                                      logicCollimeter,                                     // its mother  volume
+                                      false,                                               // no boolean operations
+                                      0,                                                   // copy number
+                                      fCheckOverlaps);                                     // checking overlaps
             }
 
-            if (i != -abc - 1 && h != -29)
+            if (i != -x_num - 1 && y_num != -29)
             {
                 G4VPhysicalVolume *physVacuum_Tube_b =
                     new G4PVPlacement(rotCounter,                                          // no rotation
@@ -573,14 +562,14 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
                                       fCheckOverlaps);                                     // checking overlaps
 
                 G4VPhysicalVolume *physVacuum_Tube_a =
-                    new G4PVPlacement(rotCounter,                                      // no rotation
-                                      G4ThreeVector(x_width, y_width * (h + 0.25), 0), // at (0,0,0)
-                                      logicVacuum_Tube,                                // its logical volume
-                                      "Vacuum_TubePV",                                 // its name
-                                      logicCollimeter,                                 // its mother  volume
-                                      false,                                           // no boolean operations
-                                      0,                                               // copy number
-                                      fCheckOverlaps);                                 // checking overlaps
+                    new G4PVPlacement(rotCounter,                                          // no rotation
+                                      G4ThreeVector(x_width, y_width * (y_num + 0.25), 0), // at (0,0,0)
+                                      logicVacuum_Tube,                                    // its logical volume
+                                      "Vacuum_TubePV",                                     // its name
+                                      logicCollimeter,                                     // its mother  volume
+                                      false,                                               // no boolean operations
+                                      0,                                                   // copy number
+                                      fCheckOverlaps);                                     // checking overlaps
             }
         }
     }
@@ -588,33 +577,27 @@ G4VPhysicalVolume *B3DetectorConstruction::Construct()
     //
     // Visualization attributes
     //
-    G4VisAttributes *boxVisAtt = new G4VisAttributes(G4Colour(1.0, 0.0, 0.0));
-    G4VisAttributes *chamberVisAtt = new G4VisAttributes(G4Colour(1.0, 0.5, 0.0));
-    G4VisAttributes *AlVisAtt = new G4VisAttributes(G4Colour(1.0, 0.0, 1.0));
-    G4VisAttributes *SnVisAtt = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
-    G4VisAttributes *PbVisAtt = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
+    G4VisAttributes *RedVisAtt = new G4VisAttributes(G4Colour(1.0, 0.0, 0.0));
+    G4VisAttributes *OrangeVisAtt = new G4VisAttributes(G4Colour(1.0, 0.5, 0.0));
+    G4VisAttributes *MagentaVisAtt = new G4VisAttributes(G4Colour(1.0, 0.0, 1.0));
+    G4VisAttributes *GreenVisAtt = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
+    G4VisAttributes *BlueVisAtt = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
 
-    logicWorld->SetVisAttributes(boxVisAtt);
-    logicGasCell->SetVisAttributes(chamberVisAtt);
-    logicAlChamber->SetVisAttributes(chamberVisAtt);
-    logicSensitive->SetVisAttributes(PbVisAtt);
-
-    logicBe_window->SetVisAttributes(AlVisAtt);
-    logicCollimeter->SetVisAttributes(PbVisAtt);
-    logicVacuum_Tube->SetVisAttributes(SnVisAtt);
-
-    logicVacu->SetVisAttributes(chamberVisAtt);
-
-    logicGem_Cu->SetVisAttributes(SnVisAtt);
-    logicGem_Lcp->SetVisAttributes(boxVisAtt);
-
-    //logicSnRing->SetVisAttributes(SnVisAtt);
-    //logicSnLid->SetVisAttributes(SnVisAtt);
+    logicWorld->SetVisAttributes(RedVisAtt);
+    logicGasCell->SetVisAttributes(OrangeVisAtt);
+    logicAlChamber->SetVisAttributes(OrangeVisAtt);
+    logicSensitive->SetVisAttributes(BlueVisAtt);
+    logicBe_window->SetVisAttributes(MagentaVisAtt);
+    logicCollimeter->SetVisAttributes(BlueVisAtt);
+    logicVacuum_Tube->SetVisAttributes(GreenVisAtt);
+    logicVacu->SetVisAttributes(OrangeVisAtt);
+    logicGem_Cu->SetVisAttributes(GreenVisAtt);
+    logicGem_Lcp->SetVisAttributes(RedVisAtt);
     /*
-    logicPbTube->SetVisAttributes(PbVisAtt);
-    logicPbLid1->SetVisAttributes(PbVisAtt);
-    logicPbLid2->SetVisAttributes(PbVisAtt);
-    logicPbLid3->SetVisAttributes(PbVisAtt);
+    logicPbTube->SetVisAttributes(BlueVisAtt);
+    logicPbLid1->SetVisAttributes(BlueVisAtt);
+    logicPbLid2->SetVisAttributes(BlueVisAtt);
+    logicPbLid3->SetVisAttributes(BlueVisAtt);
 */
     return physWorld;
 }
