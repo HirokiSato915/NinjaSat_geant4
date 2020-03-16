@@ -1,4 +1,4 @@
 --
-test
-from github
+1. build用のファイルをつくる。
+2. cmake ../G4NinjaSat/
 --
